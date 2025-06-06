@@ -6,8 +6,11 @@
     <title>Wildlife Reserve Simulator</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
+
         @keyframes rainFall {
-            to { transform: translateY(100vh); }
+            to { 
+                transform: translateY(100vh) translateX(var(--rain-x, 50px));
+            }
         }
         
         .creature {
@@ -31,7 +34,7 @@
             height: 15px;
             background: #00AEFF;
             opacity: 0.6;
-            animation: rainFall linear infinite;
+            animation: rainFall linear forwards;
             z-index: 5;
         }
         
@@ -98,19 +101,19 @@
                 </h3>
                 <div class="grid grid-cols-2 gap-2">
                     <button class="creature-btn bg-green-100 hover:bg-green-200 text-green-800 py-2 px-3 rounded-lg flex flex-col items-center transition-all" data-type="rabbit" onclick="openAnimalModal('rabbit')">
-                        <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cGF0aCBmaWxsPSIjOEQ2RTYzIiBkPSJNNDQ4IDI1NkM0NDggMTUwLjEgMzU3LjkgNjQgMjU2IDY0UzY0IDE1MC4xIDY0IDI1NnM5MC4xIDE5MiAxOTIgMTkyIDE5Mi04NS45IDE5Mi0xOTJ6Ii8+PHBhdGggZmlsbD0iIzhENkU2MyIgZD0iTTI4OCAxNjBjMCAxNy43LTE0LjMgMzItMzIgMzJzLTMyLTE0LjMtMzItMzIgMTQuMy0zMiAzMi0zMiAzMiAxNC4zIDMyIDMyem0xMjggMGMwIDE3LjctMTQuMyAzMi0zMiAzMnMtMzItMTQuMy0zMi0zMiAxNC4zLTMyIDMyLTMyIDMyIDE0LjMgMzIgMzJ6Ii8+PHBhdGggZmlsbD0iIzhENkU2MyIgZD0iTTM1MiAyODhjMCAzNS4zLTI4LjcgNjQtNjQgNjRoLTY0Yy0zNS4zIDAtNjQtMjguNy02NC02NHYtMzJoMTkydjMyeiIvPjwvc3ZnPg==" class="animal-icon mb-1">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="animal-icon lucide-rabbit"><path d="M13 16a3 3 0 0 1 2.24 5"/><path d="M18 12h.01"/><path d="M18 21h-8a4 4 0 0 1-4-4 7 7 0 0 1 7-7h.2L9.6 6.4a1 1 0 1 1 2.8-2.8L15.8 7h.2c3.3 0 6 2.7 6 6v1a2 2 0 0 1-2 2h-1a3 3 0 0 0-3 3"/><path d="M20 8.54V4a2 2 0 1 0-4 0v3"/><path d="M7.612 12.524a3 3 0 1 0-1.6 4.3"/></svg>
                         Rabbit
                     </button>
                     <button class="creature-btn bg-green-100 hover:bg-green-200 text-green-800 py-2 px-3 rounded-lg flex flex-col items-center transition-all" data-type="bird" onclick="openAnimalModal('bird')">
-                        <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cGF0aCBmaWxsPSIjNTQ2RTdBIiBkPSJNNDE5LjkgMzA5LjVjLTEuNS0xLjYtNDUuOS01MC4x-96LjItMTUuMy0xNi4zLTM2LjktMjYuNi01OS41LTI2LjYzOS4xLTEyNi4xIDY2LjEtMTI2LjEgNjYuMUwyNTYgMTI4bDY0LTY0LTY0LTY0LTY0IDY0LTY0LTY0LTY0IDY0IDY0IDY0LTg1LjkgODUuOXMtMTI1LjktNjYtMTI2LjEtNjYuMWMtMjIuNiAwLTQzLjIgMTAuMy01OS41IDI2LjZDMTMuMyAyNjMuNiAwIDMwMy44IDAgMzQ0YzAgNDEuOCAzMy45IDc1LjcgNzUuNyA3NS43IDQwLjIgMCA4MC40LTEzLjMgMTA2LjUtMzkuNGw4NS45LTg1LjkgODUuOSA4NS45YzI2LjEgMjYuMSA2Ni4zIDM5LjQgMTA2LjUgMzkuNCA0MS44IDAgNzUuNy0zMy45IDc1LjctNzUuNyAwLTQwLjItMTMuMy04MC40LTM5LjQtMTA2LjV6Ii8+PC9zdmc+" class="animal-icon mb-1">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="animal-icon lucide-bird"><path d="M16 7h.01"/><path d="M3.4 18H12a8 8 0 0 0 8-8V7a4 4 0 0 0-7.28-2.3L2 20"/><path d="m20 7 2 .5-2 .5"/><path d="M10 18v3"/><path d="M14 17.75V21"/><path d="M7 18a6 6 0 0 0 3.84-10.61"/></svg>
                         Bird
                     </button>
                     <button class="creature-btn bg-green-100 hover:bg-green-200 text-green-800 py-2 px-3 rounded-lg flex flex-col items-center transition-all" data-type="deer" onclick="openAnimalModal('deer')">
-                        <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cGF0aCBmaWxsPSIjQTE4ODdGIiBkPSJNNDQ4IDI1NkM0NDggMTUwLjEgMzU3LjkgNjQgMjU2IDY0UzY0IDE1MC4xIDY0IDI1NnM5MC4xIDE5MiAxOTIgMTkyIDE5Mi04NS45IDE5Mi0xOTJ6Ii8+PHBhdGggZmlsbD0iI0ExODg3RiIgZD0iTTI4OCAxNjBjMCAxNy43LTE0LjMgMzItMzIgMzJzLTMyLTE0LjMtMzItMzIgMTQuMy0zMiAzMi0zMiAzMiAxNC4zIDMyIDMyem0xMjggMGMwIDE3LjctMTQuMyAzMi0zMiAzMnMtMzItMTQuMy0zMi0zMiAxNC4zLTMyIDMyLTMyIDMyIDE0LjMgMzIgMzJ6Ii8+PHBhdGggZmlsbD0iI0ExODg3RiIgZD0iTTM1MiAzMjBjMCAzNS4zLTI4LjcgNjQtNjQgNjRoLTY0Yy0zNS4zIDAtNjQtMjguNy02NC02NHYtNjRoMTkydjY0eiIvPjxwYXRoIGZpbGw9IiNBMjg4N0YiIGQ9Ik0zNTIgMjU2aC0xOTJ2LTY0aDE5MnY2NHoiLz48L3N2Zz4=" class="animal-icon mb-1">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="animal-icon lucide-dog"><path d="M11.25 16.25h1.5L12 17z"/><path d="M16 14v.5"/><path d="M4.42 11.247A13.152 13.152 0 0 0 4 14.556C4 18.728 7.582 21 12 21s8-2.272 8-6.444a11.702 11.702 0 0 0-.493-3.309"/><path d="M8 14v.5"/><path d="M8.5 8.5c-.384 1.05-1.083 2.028-2.344 2.5-1.931.722-3.576-.297-3.656-1-.113-.994 1.177-6.53 4-7 1.923-.321 3.651.845 3.651 2.235A7.497 7.497 0 0 1 14 5.277c0-1.39 1.844-2.598 3.767-2.277 2.823.47 4.113 6.006 4 7-.08.703-1.725 1.722-3.656 1-1.261-.472-1.855-1.45-2.239-2.5"/></svg>
                         Deer
                     </button>
                     <button class="creature-btn bg-green-100 hover:bg-green-200 text-green-800 py-2 px-3 rounded-lg flex flex-col items-center transition-all" data-type="fox" onclick="openAnimalModal('fox')">
-                        <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cGF0aCBmaWxsPSIjRkY2RjAwIiBkPSJNNDQ4IDI1NkM0NDggMTUwLjEgMzU3LjkgNjQgMjU2IDY0UzY0IDE1MC4xIDY0IDI1NnM5MC4xIDE5MiAxOTIgMTkyIDE5Mi04NS45IDE5Mi0xOTJ6Ii8+PHBhdGggZmlsbD0iI0ZGNEQwMCIgZD0iTTI4OCAxNjBjMCAxNy43LTE0LjMgMzItMzIgMzJzLTMyLTE0LjMtMzItMzIgMTQuMy0zMiAzMi0zMiAzMiAxNC4zIDMyIDMyem0xMjggMGMwIDE3LjctMTQuMyAzMi0zMiAzMnMtMzItMTQuMy0zMi0zMiAxNC4zLTMyIDMyLTMyIDMyIDE0LjMgMzIgMzJ6Ii8+PHBhdGggZmlsbD0iI0ZGNEQwMCIgZD0iTTM1MiAyODhjMCAzNS4zLTI4LjcgNjQtNjQgNjRoLTY0Yy0zNS4zIDAtNjQtMjguNy02NC02NHYtMzJoMTkydjMyeiIvPjwvc3ZnPg==" class="animal-icon mb-1">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="animal-icon lucide-cat"><path d="M12 5c.67 0 1.35.09 2 .26 1.78-2 5.03-2.84 6.42-2.26 1.4.58-.42 7-.42 7 .57 1.07 1 2.24 1 3.44C21 17.9 16.97 21 12 21s-9-3-9-7.56c0-1.25.5-2.4 1-3.44 0 0-1.89-6.42-.5-7 1.39-.58 4.72.23 6.5 2.23A9.04 9.04 0 0 1 12 5Z"/><path d="M8 14v.5"/><path d="M16 14v.5"/><path d="M11.25 16.25h1.5L12 17l-.75-.75Z"/></svg>
                         Fox
                     </button>
                 </div>
@@ -126,15 +129,15 @@
                 </h3>
                 <div class="grid grid-cols-2 gap-2">
                     <button class="plant-btn bg-green-100 hover:bg-green-200 text-green-800 py-2 px-3 rounded-lg flex flex-col items-center transition-all" data-type="tree" onclick="openPlantModal('tree')">
-                        <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cGF0aCBmaWxsPSIjNTU4QjJGIiBkPSJNNDQ4IDM1Mkg2NGMtMzUuMyAwLTY0IDI4LjctNjQgNjR2MzJoNDQ4di0zMmMwLTM1LjMtMjguNy02NC02NC02NHoiLz48cGF0aCBmaWxsPSIjNkI5QjNBIiBkPSJNMjU2IDEyOGMtNzAuNyAwLTEyOCA1Ny4zLTEyOCAxMjhoMjU2YzAtNzAuNy01Ny4zLTEyOC0xMjgtMTI4eiIvPjxwYXRoIGZpbGw9IiM1NThCMkYiIGQ9Ik0yNTYgNjRjLTcwLjcgMC0xMjggNTcuMy0xMjggMTI4aDI1NmMwLTcwLjctNTcuMy0xMjgtMTI4LTEyOHoiLz48L3N2Zz4=" class="plant-icon mb-1">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="plant-icon lucide-tree-pine"><path d="m17 14 3 3.3a1 1 0 0 1-.7 1.7H4.7a1 1 0 0 1-.7-1.7L7 14h-.3a1 1 0 0 1-.7-1.7L9 9h-.2A1 1 0 0 1 8 7.3L12 3l4 4.3a1 1 0 0 1-.8 1.7H15l3 3.3a1 1 0 0 1-.7 1.7H17Z"/><path d="M12 22v-3"/></svg>
                         Tree
                     </button>
                     <button class="plant-btn bg-green-100 hover:bg-green-200 text-green-800 py-2 px-3 rounded-lg flex flex-col items-center transition-all" data-type="bush" onclick="openPlantModal('bush')">
-                        <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cGF0aCBmaWxsPSIjNjg5RjM4IiBkPSJNNDQ4IDM1Mkg2NGMtMzUuMyAwLTY0IDI4LjctNjQgNjR2MzJoNDQ4di0zMmMwLTM1LjMtMjguNy02NC02NC02NHoiLz48cGF0aCBmaWxsPSIjNjg5RjM4IiBkPSJNMzg0IDIyNGMwIDcwLjctNTcuMyAxMjgtMTI4IDEyOHMtMTI4LTU3LjMtMTI4LTEyOCA1Ny4zLTEyOCAxMjgtMTI4IDEyOCA1Ny4zIDEyOCAxMjh6Ii8+PC9zdmc+" class="plant-icon mb-1">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="plant-icon lucide-tree-deciduous"><path d="M8 19a4 4 0 0 1-2.24-7.32A3.5 3.5 0 0 1 9 6.03V6a3 3 0 1 1 6 0v.04a3.5 3.5 0 0 1 3.24 5.65A4 4 0 0 1 16 19Z"/><path d="M12 19v3"/></svg>
                         Bush
                     </button>
                     <button class="plant-btn bg-green-100 hover:bg-green-200 text-green-800 py-2 px-3 rounded-lg flex flex-col items-center transition-all" data-type="grass" onclick="openPlantModal('grass')">
-                        <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cGF0aCBmaWxsPSIjN0NCMzQyIiBkPSJNNDQ4IDM1Mkg2NGMtMzUuMyAwLTY0IDI4LjctNjQgNjR2MzJoNDQ4di0zMmMwLTM1LjMtMjguNy02NC02NC02NHoiLz48cGF0aCBmaWxsPSIjN0NCMzQyIiBkPSJNMzg0IDI1NmMwIDcwLjctNTcuMyAxMjgtMTI4IDEyOHMtMTI4LTU3LjMtMTI4LTEyOCA1Ny4zLTEyOCAxMjgtMTI4IDEyOCA1Ny4zIDEyOCAxMjh6Ii8+PC9zdmc+" class="plant-icon mb-1">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="plant-icon lucide-tree-palm"><path d="M13 8c0-2.76-2.46-5-5.5-5S2 5.24 2 8h2l1-1 1 1h4"/><path d="M13 7.14A5.82 5.82 0 0 1 16.5 6c3.04 0 5.5 2.24 5.5 5h-3l-1-1-1 1h-3"/><path d="M5.89 9.71c-2.15 2.15-2.3 5.47-.35 7.43l4.24-4.25.7-.7.71-.71 2.12-2.12c-1.95-1.96-5.27-1.8-7.42.35"/><path d="M11 15.5c.5 2.5-.17 4.5-1 6.5h4c2-5.5-.5-12-1-14"/></svg>
                         Grass
                     </button>
                 </div>
@@ -447,6 +450,8 @@
                 this.currentPlant = null;
                 this.currentTerrainModal = null;
                 this.rainInterval = null;
+                this.lastRainDropTime = 0;
+                this.rainDropDelay = 0;
                 
                 this.init();
             }
@@ -495,6 +500,10 @@
                     document.getElementById('rain-value').textContent = this.weather.rain;
                     this.updateWeather();
                     this.updateModalWeather();
+                    
+                    // Update rain drop delay based on intensity (0-100 maps to 1000ms-50ms) / 4 -> 40-2 ms
+                    this.rainDropDelay = (1000 - (this.weather.rain * 9.5)) / 500;
+                    if (this.rainDropDelay < 0.1) this.rainDropDelay = 0.1; // Minimum delay to avoid too fast drops
                 });
 
                 document.getElementById('temp-slider').addEventListener('input', (e) => {
@@ -526,8 +535,8 @@
                 creature.style.left = `${x - 20}px`;
                 creature.style.top = `${y - 20}px`;
                 
-                const img = document.createElement('img');
-                img.src = this.getCreatureImage(type);
+                const img = document.createElement('div');
+                img.innerHTML = this.getCreatureSVG(type);
                 img.className = 'animal-icon';
                 creature.appendChild(img);
                 
@@ -558,8 +567,8 @@
                 plant.style.left = `${x - 20}px`;
                 plant.style.top = `${y - 20}px`;
                 
-                const img = document.createElement('img');
-                img.src = this.getPlantImage(type);
+                const img = document.createElement('div');
+                img.innerHTML = this.getPlantSVG(type);
                 img.className = 'plant-icon';
                 plant.appendChild(img);
                 
@@ -582,23 +591,23 @@
                 });
             }
 
-            getCreatureImage(type) {
-                const images = {
-                    rabbit: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cGF0aCBmaWxsPSIjOEQ2RTYzIiBkPSJNNDQ4IDI1NkM0NDggMTUwLjEgMzU3LjkgNjQgMjU2IDY0UzY0IDE1MC4xIDY0IDI1NnM5MC4xIDE5MiAxOTIgMTkyIDE5Mi04NS45IDE5Mi0xOTJ6Ii8+PHBhdGggZmlsbD0iIzhENkU2MyIgZD0iTTI4OCAxNjBjMCAxNy43LTE0LjMgMzItMzIgMzJzLTMyLTE0LjMtMzItMzIgMTQuMy0zMiAzMi0zMiAzMiAxNC4zIDMyIDMyem0xMjggMGMwIDE3LjctMTQuMyAzMi0zMiAzMnMtMzItMTQuMy0zMi0zMiAxNC4zLTMyIDMyLTMyIDMyIDE0LjMgMzIgMzJ6Ii8+PHBhdGggZmlsbD0iIzhENkU2MyIgZD0iTTM1MiAyODhjMCAzNS4zLTI4LjcgNjQtNjQgNjRoLTY0Yy0zNS4zIDAtNjQtMjguNy02NC02NHYtMzJoMTkydjMyeiIvPjwvc3ZnPg==',
-                    bird: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cGF0aCBmaWxsPSIjNTQ2RTdBIiBkPSJNNDE5LjkgMzA5LjVjLTEuNS0xLjYtNDUuOS01MC4x-96LjItMTUuMy0xNi4zLTM2LjktMjYuNi01OS41LTI2LjYzOS4xLTEyNi4xIDY2LjEtMTI2LjEgNjYuMUwyNTYgMTI4bDY0LTY0LTY0LTY0LTY0IDY0LTY0LTY0LTY0IDY0IDY0IDY0LTg1LjkgODUuOXMtMTI1LjktNjYtMTI2LjEtNjYuMWMtMjIuNiAwLTQzLjIgMTAuMy01OS41IDI2LjZDMTMuMyAyNjMuNiAwIDMwMy44IDAgMzQ0YzAgNDEuOCAzMy45IDc1LjcgNzUuNyA3NS43IDQwLjIgMCA4MC40LTEzLjMgMTA2LjUtMzkuNGw4NS45LTg1LjkgODUuOSA4NS45YzI2LjEgMjYuMSA2Ni4zIDM5LjQgMTA2LjUgMzkuNCA0MS44IDAgNzUuNy0zMy45IDc1LjctNzUuNyAwLTQwLjItMTMuMy04MC40LTM5LjQtMTA2LjV6Ii8+PC9zdmc+',
-                    deer: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cGF0aCBmaWxsPSIjQTE4ODdGIiBkPSJNNDQ4IDI1NkM0NDggMTUwLjEgMzU3LjkgNjQgMjU2IDY0UzY0IDE1MC4xIDY0IDI1NnM5MC4xIDE5MiAxOTIgMTkyIDE5Mi04NS45IDE5Mi0xOTJ6Ii8+PHBhdGggZmlsbD0iI0ExODg3RiIgZD0iTTI4OCAxNjBjMCAxNy43LTE0LjMgMzItMzIgMzJzLTMyLTE0LjMtMzItMzIgMTQuMy0zMiAzMi0zMiAzMiAxNC4zIDMyIDMyem0xMjggMGMwIDE3LjctMTQuMyAzMi0zMiAzMnMtMzItMTQuMy0zMi0zMiAxNC4zLTMyIDMyLTMyIDMyIDE0LjMgMzIgMzJ6Ii8+PHBhdGggZmlsbD0iI0ExODg3RiIgZD0iTTM1MiAzMjBjMCAzNS4zLTI4LjcgNjQtNjQgNjRoLTY0Yy0zNS4zIDAtNjQtMjguNy02NC02NHYtNjRoMTkydjY0eiIvPjxwYXRoIGZpbGw9IiNBMjg4N0YiIGQ9Ik0zNTIgMjU2aC0xOTJ2LTY0aDE5MnY2NHoiLz48L3N2Zz4=',
-                    fox: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cGF0aCBmaWxsPSIjRkY2RjAwIiBkPSJNNDQ4IDI1NkM0NDggMTUwLjEgMzU3LjkgNjQgMjU2IDY0UzY0IDE1MC4xIDY0IDI1NnM5MC4xIDE5MiAxOTIgMTkyIDE5Mi04NS45IDE5Mi0xOTJ6Ii8+PHBhdGggZmlsbD0iI0ZGNEQwMCIgZD0iTTI4OCAxNjBjMCAxNy43LTE0LjMgMzItMzIgMzJzLTMyLTE0LjMtMzItMzIgMTQuMy0zMiAzMi0zMiAzMiAxNC4zIDMyIDMyem0xMjggMGMwIDE3LjctMTQuMyAzMi0zMiAzMnMtMzItMTQuMy0zMi0zMiAxNC4zLTMyIDMyLTMyIDMyIDE0LjMgMzIgMzJ6Ii8+PHBhdGggZmlsbD0iI0ZGNEQwMCIgZD0iTTM1MiAyODhjMCAzNS4zLTI4LjcgNjQtNjQgNjRoLTY0Yy0zNS4zIDAtNjQtMjguNy02NC02NHYtMzJoMTkydjMyeiIvPjwvc3ZnPg=='
+            getCreatureSVG(type) {
+                const svgs = {
+                    rabbit: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-rabbit"><path d="M13 16a3 3 0 0 1 2.24 5"/><path d="M18 12h.01"/><path d="M18 21h-8a4 4 0 0 1-4-4 7 7 0 0 1 7-7h.2L9.6 6.4a1 1 0 1 1 2.8-2.8L15.8 7h.2c3.3 0 6 2.7 6 6v1a2 2 0 0 1-2 2h-1a3 3 0 0 0-3 3"/><path d="M20 8.54V4a2 2 0 1 0-4 0v3"/><path d="M7.612 12.524a3 3 0 1 0-1.6 4.3"/></svg>',
+                    bird: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-bird"><path d="M16 7h.01"/><path d="M3.4 18H12a8 8 0 0 0 8-8V7a4 4 0 0 0-7.28-2.3L2 20"/><path d="m20 7 2 .5-2 .5"/><path d="M10 18v3"/><path d="M14 17.75V21"/><path d="M7 18a6 6 0 0 0 3.84-10.61"/></svg>',
+                    deer: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-dog"><path d="M11.25 16.25h1.5L12 17z"/><path d="M16 14v.5"/><path d="M4.42 11.247A13.152 13.152 0 0 0 4 14.556C4 18.728 7.582 21 12 21s8-2.272 8-6.444a11.702 11.702 0 0 0-.493-3.309"/><path d="M8 14v.5"/><path d="M8.5 8.5c-.384 1.05-1.083 2.028-2.344 2.5-1.931.722-3.576-.297-3.656-1-.113-.994 1.177-6.53 4-7 1.923-.321 3.651.845 3.651 2.235A7.497 7.497 0 0 1 14 5.277c0-1.39 1.844-2.598 3.767-2.277 2.823.47 4.113 6.006 4 7-.08.703-1.725 1.722-3.656 1-1.261-.472-1.855-1.45-2.239-2.5"/></svg>',
+                    fox: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-cat"><path d="M12 5c.67 0 1.35.09 2 .26 1.78-2 5.03-2.84 6.42-2.26 1.4.58-.42 7-.42 7 .57 1.07 1 2.24 1 3.44C21 17.9 16.97 21 12 21s-9-3-9-7.56c0-1.25.5-2.4 1-3.44 0 0-1.89-6.42-.5-7 1.39-.58 4.72.23 6.5 2.23A9.04 9.04 0 0 1 12 5Z"/><path d="M8 14v.5"/><path d="M16 14v.5"/><path d="M11.25 16.25h1.5L12 17l-.75-.75Z"/></svg>'
                 };
-                return images[type];
+                return svgs[type];
             }
 
-            getPlantImage(type) {
-                const images = {
-                    tree: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cGF0aCBmaWxsPSIjNTU4QjJGIiBkPSJNNDQ4IDM1Mkg2NGMtMzUuMyAwLTY0IDI4LjctNjQgNjR2MzJoNDQ4di0zMmMwLTM1LjMtMjguNy02NC02NC02NHoiLz48cGF0aCBmaWxsPSIjNkI5QjNBIiBkPSJNMjU2IDEyOGMtNzAuNyAwLTEyOCA1Ny4zLTEyOCAxMjhoMjU2YzAtNzAuNy01Ny4zLTEyOC0xMjgtMTI4eiIvPjxwYXRoIGZpbGw9IiM1NThCMkYiIGQ9Ik0yNTYgNjRjLTcwLjcgMC0xMjggNTcuMy0xMjggMTI4aDI1NmMwLTcwLjctNTcuMy0xMjgtMTI4LTEyOHoiLz48L3N2Zz4=',
-                    bush: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cGF0aCBmaWxsPSIjNjg5RjM4IiBkPSJNNDQ4IDM1Mkg2NGMtMzUuMyAwLTY0IDI4LjctNjQgNjR2MzJoNDQ4di0zMmMwLTM1LjMtMjguNy02NC02NC02NHoiLz48cGF0aCBmaWxsPSIjNjg5RjM4IiBkPSJNMzg0IDIyNGMwIDcwLjctNTcuMyAxMjgtMTI4IDEyOHMtMTI4LTU3LjMtMTI4LTEyOCA1Ny4zLTEyOCAxMjgtMTI4IDEyOCA1Ny4zIDEyOCAxMjh6Ii8+PC9zdmc+',
-                    grass: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cGF0aCBmaWxsPSIjN0NCMzQyIiBkPSJNNDQ4IDM1Mkg2NGMtMzUuMyAwLTY0IDI4LjctNjQgNjR2MzJoNDQ4di0zMmMwLTM1LjMtMjguNy02NC02NC02NHoiLz48cGF0aCBmaWxsPSIjN0NCMzQyIiBkPSJNMzg0IDI1NmMwIDcwLjctNTcuMyAxMjgtMTI4IDEyOHMtMTI4LTU3LjMtMTI4LTEyOCA1Ny4zLTEyOCAxMjgtMTI4IDEyOCA1Ny4zIDEyOCAxMjh6Ii8+PC9zdmc+'
+            getPlantSVG(type) {
+                const svgs = {
+                    tree: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-tree-pine"><path d="m17 14 3 3.3a1 1 0 0 1-.7 1.7H4.7a1 1 0 0 1-.7-1.7L7 14h-.3a1 1 0 0 1-.7-1.7L9 9h-.2A1 1 0 0 1 8 7.3L12 3l4 4.3a1 1 0 0 1-.8 1.7H15l3 3.3a1 1 0 0 1-.7 1.7H17Z"/><path d="M12 22v-3"/></svg>',
+                    bush: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-tree-deciduous"><path d="M8 19a4 4 0 0 1-2.24-7.32A3.5 3.5 0 0 1 9 6.03V6a3 3 0 1 1 6 0v.04a3.5 3.5 0 0 1 3.24 5.65A4 4 0 0 1 16 19Z"/><path d="M12 19v3"/></svg>',
+                    grass: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-tree-palm"><path d="M13 8c0-2.76-2.46-5-5.5-5S2 5.24 2 8h2l1-1 1 1h4"/><path d="M13 7.14A5.82 5.82 0 0 1 16.5 6c3.04 0 5.5 2.24 5.5 5h-3l-1-1-1 1h-3"/><path d="M5.89 9.71c-2.15 2.15-2.3 5.47-.35 7.43l4.24-4.25.7-.7.71-.71 2.12-2.12c-1.95-1.96-5.27-1.8-7.42.35"/><path d="M11 15.5c.5 2.5-.17 4.5-1 6.5h4c2-5.5-.5-12-1-14"/></svg>'
                 };
-                return images[type];
+                return svgs[type];
             }
 
             removeCreature(creature) {
@@ -663,7 +672,7 @@
                     if (Object.keys(animalCounts).length > 0) {
                         html += '<div class="bg-green-50 p-4 rounded-lg"><h4 class="font-semibold text-green-700 mb-2">Animal Populations</h4><div class="grid grid-cols-2 gap-2">';
                         Object.entries(animalCounts).forEach(([type, count]) => {
-                            html += `<div class="flex items-center gap-2"><img src="${this.getCreatureImage(type)}" class="w-6 h-6"> <span class="text-sm">${type.charAt(0).toUpperCase() + type.slice(1)}: ${count}</span></div>`;
+                            html += `<div class="flex items-center gap-2"><div class="w-6 h-6">${this.getCreatureSVG(type)}</div> <span class="text-sm">${type.charAt(0).toUpperCase() + type.slice(1)}: ${count}</span></div>`;
                         });
                         html += '</div></div>';
                     }
@@ -671,7 +680,7 @@
                     if (Object.keys(plantCounts).length > 0) {
                         html += '<div class="bg-green-50 p-4 rounded-lg"><h4 class="font-semibold text-green-700 mb-2">Plant Populations</h4><div class="grid grid-cols-2 gap-2">';
                         Object.entries(plantCounts).forEach(([type, count]) => {
-                            html += `<div class="flex items-center gap-2"><img src="${this.getPlantImage(type)}" class="w-6 h-6"> <span class="text-sm">${type.charAt(0).toUpperCase() + type.slice(1)}: ${count}</span></div>`;
+                            html += `<div class="flex items-center gap-2"><div class="w-6 h-6">${this.getPlantSVG(type)}</div> <span class="text-sm">${type.charAt(0).toUpperCase() + type.slice(1)}: ${count}</span></div>`;
                         });
                         html += '</div></div>';
                     }
@@ -696,24 +705,43 @@
                 sun.style.opacity = 1 - (this.weather.rain / 100);
                 sun.style.transform = `scale(${0.8 + brightness * 0.4})`;
                 
-                // Create rain based on intensity
+                // Update rain drop delay - linear scale from 0ms (at 0%) to 25ms (at 100%)
+                this.rainDropDelay = 25 - (this.weather.rain * 0.25);
+                
+                // Start rain if needed
                 if (this.weather.rain > 0) {
-                    const rainIntensity = this.weather.rain / 100;
-                    const rainCount = Math.floor(rainIntensity * 100);
-                    const rainSpeed = 0.5 + (1 - rainIntensity * 0.8); // Faster for heavier rain
+                    this.lastRainDropTime = 0;
+                    this.rainInterval = setInterval(() => this.createRainDrops(), 16); // ~60fps
+                }
+            }
+
+            createRainDrops() {
+                const now = Date.now();
+                if (now - this.lastRainDropTime > this.rainDropDelay) {
+                    this.lastRainDropTime = now;
                     
-                    this.rainInterval = setInterval(() => {
-                        for (let i = 0; i < rainCount; i++) {
-                            const drop = document.createElement('div');
-                            drop.className = 'rain-drop';
-                            drop.style.left = `${Math.random() * 100}%`;
-                            drop.style.top = `${Math.random() * -100}px`;
-                            drop.style.animationDuration = `${rainSpeed}s`;
-                            this.ecosystem.appendChild(drop);
-                            
-                            setTimeout(() => drop.remove(), rainSpeed * 1000);
-                        }
-                    }, 1000 / rainIntensity);
+                    // Create drops based on rain intensity (1 at 0%, scaling up to 10 at 100%)
+                    const dropCount = Math.max(1, Math.floor(this.weather.rain / 10));
+                    
+                    for (let i = 0; i < dropCount; i++) {
+                        const drop = document.createElement('div');
+                        drop.className = 'rain-drop';
+                        drop.style.left = `${Math.random() * 100}%`;
+                        drop.style.top = '0';
+                        
+                        // Add slight randomness to the animation duration and direction
+                        const duration = (0.25 + Math.random() * 0.25);
+                        drop.style.animationDuration = `${duration}s`;
+                        
+                        // Add slight horizontal movement (random between 30-70px to keep it uniform)
+                        const horizontalMovement = 50 + (Math.random() * 20 - 10);
+                        drop.style.setProperty('--rain-x', `${horizontalMovement}px`);
+                        
+                        this.ecosystem.appendChild(drop);
+                        
+                        // Remove drop after animation completes
+                        setTimeout(() => drop.remove(), duration * 1000);
+                    }
                 }
             }
 
@@ -812,7 +840,7 @@
                     title: 'Rabbit',
                     content: `
                         <div class="flex justify-center mb-4">
-                            <img src="${simulator.getCreatureImage('rabbit')}" class="w-20 h-20">
+                            ${simulator.getCreatureSVG('rabbit')}
                         </div>
                         <div class="bg-green-50 p-4 rounded-lg">
                             <h4 class="font-semibold text-green-700 mb-2">Characteristics</h4>
@@ -842,7 +870,7 @@
                     title: 'Bird',
                     content: `
                         <div class="flex justify-center mb-4">
-                            <img src="${simulator.getCreatureImage('bird')}" class="w-20 h-20">
+                            ${simulator.getCreatureSVG('bird')}
                         </div>
                         <div class="bg-green-50 p-4 rounded-lg">
                             <h4 class="font-semibold text-green-700 mb-2">Characteristics</h4>
@@ -872,7 +900,7 @@
                     title: 'Deer',
                     content: `
                         <div class="flex justify-center mb-4">
-                            <img src="${simulator.getCreatureImage('deer')}" class="w-20 h-20">
+                            ${simulator.getCreatureSVG('deer')}
                         </div>
                         <div class="bg-green-50 p-4 rounded-lg">
                             <h4 class="font-semibold text-green-700 mb-2">Characteristics</h4>
@@ -902,7 +930,7 @@
                     title: 'Fox',
                     content: `
                         <div class="flex justify-center mb-4">
-                            <img src="${simulator.getCreatureImage('fox')}" class="w-20 h-20">
+                            ${simulator.getCreatureSVG('fox')}
                         </div>
                         <div class="bg-green-50 p-4 rounded-lg">
                             <h4 class="font-semibold text-green-700 mb-2">Characteristics</h4>
@@ -946,7 +974,7 @@
                     title: 'Tree',
                     content: `
                         <div class="flex justify-center mb-4">
-                            <img src="${simulator.getPlantImage('tree')}" class="w-20 h-20">
+                            ${simulator.getPlantSVG('tree')}
                         </div>
                         <div class="bg-green-50 p-4 rounded-lg">
                             <h4 class="font-semibold text-green-700 mb-2">Characteristics</h4>
@@ -976,7 +1004,7 @@
                     title: 'Bush',
                     content: `
                         <div class="flex justify-center mb-4">
-                            <img src="${simulator.getPlantImage('bush')}" class="w-20 h-20">
+                            ${simulator.getPlantSVG('bush')}
                         </div>
                         <div class="bg-green-50 p-4 rounded-lg">
                             <h4 class="font-semibold text-green-700 mb-2">Characteristics</h4>
@@ -1006,7 +1034,7 @@
                     title: 'Grass',
                     content: `
                         <div class="flex justify-center mb-4">
-                            <img src="${simulator.getPlantImage('grass')}" class="w-20 h-20">
+                            ${simulator.getPlantSVG('grass')}
                         </div>
                         <div class="bg-green-50 p-4 rounded-lg">
                             <h4 class="font-semibold text-green-700 mb-2">Characteristics</h4>
