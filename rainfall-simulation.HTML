@@ -1,0 +1,1390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ecosystem Simulator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f0f4f0;
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        .container {
+            display: flex;
+            height: 100vh;
+            gap: 1rem;
+            padding: 1rem;
+        }
+
+        .control-panel {
+            background: #fff;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            width: 300px;
+            overflow-y: auto;
+            flex-shrink: 0;
+        }
+
+        .ecosystem-view {
+            flex: 1;
+            background: #e8f5e8;
+            border-radius: 12px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        h2 {
+            color: #2d5016;
+            margin-bottom: 1rem;
+            font-size: 1.25rem;
+        }
+
+        .section {
+            margin-bottom: 1.5rem;
+        }
+
+        .creature-btn, .plant-btn {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            margin: 0.25rem;
+            background: #7cb342;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+
+        .creature-btn:hover, .plant-btn:hover {
+            background: #689f38;
+            transform: translateY(-1px);
+        }
+
+        .creature-btn.selected, .plant-btn.selected {
+            background: #558b2f;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+
+        .slider-control {
+            margin: 0.75rem 0;
+        }
+
+        .slider-control label {
+            display: block;
+            color: #5d4037;
+            font-size: 0.9rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .slider-control input[type="range"] {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: #c8e6c9;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .slider-control input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #7cb342;
+            cursor: pointer;
+        }
+
+        .terrain-btn {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            margin: 0.25rem;
+            background: #8d6e63;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+
+        .terrain-btn:hover {
+            background: #795548;
+        }
+
+        .terrain-btn.active {
+            background: #5d4037;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 2rem;
+            border-radius: 12px;
+            width: 80%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            line-height: 1;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: #000;
+        }
+
+        .modal h3 {
+            color: #2d5016;
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+
+        .modal-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .info-card {
+            background: #f8f8f8;
+            padding: 1rem;
+            border-radius: 8px;
+            border-left: 4px solid #7cb342;
+        }
+
+        .info-card h4 {
+            color: #2d5016;
+            margin-bottom: 0.5rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .stat-item {
+            background: #e8f5e8;
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #2d5016;
+        }
+
+        .control-button {
+            background: #7cb342;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 0.5rem 0.5rem 0.5rem 0;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+
+        .control-button:hover {
+            background: #689f38;
+        }
+
+        .control-button.danger {
+            background: #d32f2f;
+        }
+
+        .control-button.danger:hover {
+            background: #b71c1c;
+        }
+
+        .creature {
+            position: absolute;
+            transition: all 0.5s ease-out;
+            cursor: pointer;
+            z-index: 10;
+        }
+
+        .plant {
+            position: absolute;
+            cursor: pointer;
+            z-index: 5;
+        }
+
+        .rain {
+            position: absolute;
+            width: 2px;
+            height: 15px;
+            background: #64b5f6;
+            opacity: 0.6;
+            animation: fall 1s linear infinite;
+        }
+
+        @keyframes fall {
+            to {
+                transform: translateY(100vh);
+            }
+        }
+
+        .sun {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            background: #ffd54f;
+            border-radius: 50%;
+            box-shadow: 0 0 20px #ffd54f;
+            transition: all 0.5s;
+        }
+
+        .terrain-grass {
+            background: linear-gradient(to bottom, #c8e6c9, #a5d6a7);
+        }
+
+        .terrain-desert {
+            background: linear-gradient(to bottom, #ffcc80, #ffb74d);
+        }
+
+        .terrain-forest {
+            background: linear-gradient(to bottom, #81c784, #66bb6a);
+        }
+
+        .terrain-water {
+            background: linear-gradient(to bottom, #81d4fa, #64b5f6);
+        }
+
+        .rabbit {
+            width: 30px;
+            height: 30px;
+            background: #8d6e63;
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+        }
+
+        .rabbit::before {
+            content: '';
+            position: absolute;
+            width: 10px;
+            height: 15px;
+            background: #8d6e63;
+            border-radius: 50%;
+            top: -10px;
+            left: 3px;
+        }
+
+        .rabbit::after {
+            content: '';
+            position: absolute;
+            width: 10px;
+            height: 15px;
+            background: #8d6e63;
+            border-radius: 50%;
+            top: -10px;
+            right: 3px;
+        }
+
+        .bird {
+            width: 25px;
+            height: 20px;
+            background: #546e7a;
+            border-radius: 50% 0 50% 0;
+            transform: rotate(45deg);
+        }
+
+        .deer {
+            width: 40px;
+            height: 35px;
+            background: #a1887f;
+            border-radius: 40% 40% 50% 50%;
+        }
+
+        .fox {
+            width: 35px;
+            height: 25px;
+            background: #ff6f00;
+            border-radius: 50% 50% 40% 40%;
+        }
+
+        .tree {
+            width: 40px;
+            height: 50px;
+            background: #558b2f;
+            border-radius: 50% 50% 0 0;
+            position: relative;
+        }
+
+        .tree::after {
+            content: '';
+            position: absolute;
+            bottom: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 10px;
+            height: 20px;
+            background: #5d4037;
+        }
+
+        .bush {
+            width: 35px;
+            height: 25px;
+            background: #689f38;
+            border-radius: 50%;
+        }
+
+        .grass-patch {
+            width: 30px;
+            height: 15px;
+            background: #7cb342;
+            border-radius: 0 0 50% 50%;
+        }
+
+        .info-display {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            background: rgba(255,255,255,0.9);
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            color: #5d4037;
+            cursor: pointer;
+        }
+
+        .info-display:hover {
+            background: rgba(255,255,255,1);
+            transform: scale(1.05);
+        }
+
+        .info-btn {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(255,255,255,0.9);
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: all 0.2s;
+        }
+
+        .info-btn:hover {
+            background: rgba(255,255,255,1);
+            transform: scale(1.1);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+                padding: 0.5rem;
+                gap: 0.5rem;
+            }
+
+            .control-panel {
+                width: 100%;
+                height: 40vh;
+                padding: 1rem;
+            }
+
+            .ecosystem-view {
+                height: 60vh;
+            }
+
+            .modal-content {
+                width: 95%;
+                margin: 10% auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="control-panel">
+            <h2>🌿 Ecosystem Controls</h2>
+            
+            <div class="section">
+                <h3>Animals</h3>
+                <button class="creature-btn" data-type="rabbit" onclick="openAnimalModal('rabbit')">🐰 Rabbit</button>
+                <button class="creature-btn" data-type="bird" onclick="openAnimalModal('bird')">🦅 Bird</button>
+                <button class="creature-btn" data-type="deer" onclick="openAnimalModal('deer')">🦌 Deer</button>
+                <button class="creature-btn" data-type="fox" onclick="openAnimalModal('fox')">🦊 Fox</button>
+            </div>
+
+            <div class="section">
+                <h3>Plants</h3>
+                <button class="plant-btn" data-type="tree" onclick="openPlantModal('tree')">🌳 Tree</button>
+                <button class="plant-btn" data-type="bush" onclick="openPlantModal('bush')">🌿 Bush</button>
+                <button class="plant-btn" data-type="grass" onclick="openPlantModal('grass')">🌱 Grass</button>
+            </div>
+
+            <div class="section">
+                <h3>Weather</h3>
+                <div class="slider-control">
+                    <label>Rainfall: <span id="rain-value">0</span>%</label>
+                    <input type="range" id="rain-slider" min="0" max="100" value="0">
+                </div>
+                <div class="slider-control">
+                    <label>Temperature: <span id="temp-value">20</span>°C</label>
+                    <input type="range" id="temp-slider" min="-10" max="40" value="20">
+                </div>
+                <button class="control-button" onclick="openWeatherModal()">Weather Details</button>
+            </div>
+
+            <div class="section">
+                <h3>Vegetation Density</h3>
+                <div class="slider-control">
+                    <label>Density: <span id="vegetation-value">50</span>%</label>
+                    <input type="range" id="vegetation-slider" min="0" max="100" value="50">
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>Terrain</h3>
+                <button class="terrain-btn active" data-terrain="grass" onclick="openTerrainModal('grass')">Grassland</button>
+                <button class="terrain-btn" data-terrain="desert" onclick="openTerrainModal('desert')">Desert</button>
+                <button class="terrain-btn" data-terrain="forest" onclick="openTerrainModal('forest')">Forest</button>
+                <button class="terrain-btn" data-terrain="water" onclick="openTerrainModal('water')">Wetland</button>
+            </div>
+        </div>
+
+        <div class="ecosystem-view terrain-grass" id="ecosystem">
+            <button class="info-btn" onclick="openHelpModal()">ℹ️</button>
+            <div class="sun" id="sun"></div>
+            <div class="info-display" onclick="openStatsModal()">
+                <span id="creature-count">Animals: 0</span> | 
+                <span id="plant-count">Plants: 0</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <div id="animalModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('animalModal')">&times;</span>
+            <h3 id="animalTitle">Animal Information</h3>
+            <div id="animalContent"></div>
+            <button class="control-button" onclick="selectAnimalForPlacement()">Place This Animal</button>
+        </div>
+    </div>
+
+    <div id="plantModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('plantModal')">&times;</span>
+            <h3 id="plantTitle">Plant Information</h3>
+            <div id="plantContent"></div>
+            <button class="control-button" onclick="selectPlantForPlacement()">Place This Plant</button>
+        </div>
+    </div>
+
+    <div id="weatherModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('weatherModal')">&times;</span>
+            <h3>Weather System</h3>
+            <div id="weatherContent">
+                <div class="info-card">
+                    <h4>Current Conditions</h4>
+                    <p>Temperature: <span id="modal-temp">20</span>°C</p>
+                    <p>Rainfall: <span id="modal-rain">0</span>%</p>
+                    <p>Weather Type: <span id="weather-type">Sunny</span></p>
+                </div>
+                <div class="modal-grid">
+                    <div class="info-card">
+                        <h4>Temperature Effects</h4>
+                        <p>• Cold (&lt;10°C): Animals move slower</p>
+                        <p>• Hot (&gt;30°C): Reduced plant growth</p>
+                        <p>• Optimal (15-25°C): Balanced ecosystem</p>
+                    </div>
+                    <div class="info-card">
+                        <h4>Rainfall Effects</h4>
+                        <p>• Low (&lt;30%): Desert conditions</p>
+                        <p>• High (&gt;70%): Wetland environment</p>
+                        <p>• Heavy rain slows animal movement</p>
+                    </div>
+                </div>
+            </div>
+            <button class="control-button" onclick="setRandomWeather()">Random Weather</button>
+            <button class="control-button" onclick="setStormWeather()">Create Storm</button>
+            <button class="control-button" onclick="setClearWeather()">Clear Weather</button>
+        </div>
+    </div>
+
+    <div id="terrainModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('terrainModal')">&times;</span>
+            <h3 id="terrainTitle">Terrain Information</h3>
+            <div id="terrainContent"></div>
+            <button class="control-button" onclick="selectTerrain()">Apply This Terrain</button>
+        </div>
+    </div>
+
+    <div id="statsModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('statsModal')">&times;</span>
+            <h3>Ecosystem Statistics</h3>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-value" id="stat-animals">0</div>
+                    <div>Total Animals</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="stat-plants">0</div>
+                    <div>Total Plants</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="stat-biodiversity">0</div>
+                    <div>Biodiversity Index</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="stat-health">Good</div>
+                    <div>Ecosystem Health</div>
+                </div>
+            </div>
+            <div id="detailed-stats"></div>
+            <button class="control-button danger" onclick="clearEcosystem()">Clear All</button>
+            <button class="control-button" onclick="generateRandomEcosystem()">Random Ecosystem</button>
+        </div>
+    </div>
+
+    <div id="helpModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('helpModal')">&times;</span>
+            <h3>How to Use the Ecosystem Simulator</h3>
+            <div class="modal-grid">
+                <div class="info-card">
+                    <h4>🎯 Placing Elements</h4>
+                    <p>Click on animals or plants in the control panel to select them, then click anywhere in the ecosystem to place them.</p>
+                </div>
+                <div class="info-card">
+                    <h4>🌦️ Weather Control</h4>
+                    <p>Use the rainfall and temperature sliders to affect the ecosystem. Weather influences animal behavior and plant growth.</p>
+                </div>
+                <div class="info-card">
+                    <h4>🏞️ Terrain Types</h4>
+                    <p>Different terrains support different species. Switch between grassland, desert, forest, and wetland environments.</p>
+                </div>
+                <div class="info-card">
+                    <h4>🔄 Interactions</h4>
+                    <p>Animals move naturally and interact with plants. Herbivores eat vegetation, affecting both populations dynamically.</p>
+                </div>
+                <div class="info-card">
+                    <h4>📊 Monitoring</h4>
+                    <p>Click the statistics display to view detailed ecosystem health metrics and biodiversity information.</p>
+                </div>
+                <div class="info-card">
+                    <h4>🗑️ Removing Elements</h4>
+                    <p>Click directly on any animal or plant in the ecosystem to remove it from the simulation.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class EcosystemSimulator {
+            constructor() {
+                this.ecosystem = document.getElementById('ecosystem');
+                this.selectedItem = null;
+                this.creatures = [];
+                this.plants = [];
+                this.currentTerrain = 'grass';
+                this.weather = { rain: 0, temperature: 20 };
+                this.vegetationDensity = 50;
+                this.currentAnimal = null;
+                this.currentPlant = null;
+                this.currentTerrainModal = null;
+                
+                this.init();
+            }
+
+            init() {
+                this.setupEventListeners();
+                this.startSimulation();
+                this.updateStats();
+            }
+
+            setupEventListeners() {
+                document.querySelectorAll('.creature-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        if (!e.target.dataset.type) return;
+                        document.querySelectorAll('.creature-btn, .plant-btn').forEach(b => b.classList.remove('selected'));
+                        e.target.classList.add('selected');
+                        this.selectedItem = { type: 'creature', subtype: e.target.dataset.type };
+                    });
+                });
+
+                document.querySelectorAll('.plant-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        if (!e.target.dataset.type) return;
+                        document.querySelectorAll('.creature-btn, .plant-btn').forEach(b => b.classList.remove('selected'));
+                        e.target.classList.add('selected');
+                        this.selectedItem = { type: 'plant', subtype: e.target.dataset.type };
+                    });
+                });
+
+                this.ecosystem.addEventListener('click', (e) => {
+                    if (this.selectedItem && e.target === this.ecosystem) {
+                        const rect = this.ecosystem.getBoundingClientRect();
+                        const x = e.clientX - rect.left;
+                        const y = e.clientY - rect.top;
+                        
+                        if (this.selectedItem.type === 'creature') {
+                            this.addCreature(this.selectedItem.subtype, x, y);
+                        } else if (this.selectedItem.type === 'plant') {
+                            this.addPlant(this.selectedItem.subtype, x, y);
+                        }
+                    }
+                });
+
+                document.getElementById('rain-slider').addEventListener('input', (e) => {
+                    this.weather.rain = parseInt(e.target.value);
+                    document.getElementById('rain-value').textContent = this.weather.rain;
+                    this.updateWeather();
+                    this.updateModalWeather();
+                });
+
+                document.getElementById('temp-slider').addEventListener('input', (e) => {
+                    this.weather.temperature = parseInt(e.target.value);
+                    document.getElementById('temp-value').textContent = this.weather.temperature;
+                    this.updateWeather();
+                    this.updateModalWeather();
+                });
+
+                document.getElementById('vegetation-slider').addEventListener('input', (e) => {
+                    this.vegetationDensity = parseInt(e.target.value);
+                    document.getElementById('vegetation-value').textContent = this.vegetationDensity;
+                    this.updateVegetation();
+                });
+
+                document.querySelectorAll('.terrain-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        if (!e.target.dataset.terrain) return;
+                        document.querySelectorAll('.terrain-btn').forEach(b => b.classList.remove('active'));
+                        e.target.classList.add('active');
+                        this.changeTerrain(e.target.dataset.terrain);
+                    });
+                });
+            }
+
+            addCreature(type, x, y) {
+                const creature = document.createElement('div');
+                creature.className = `creature ${type}`;
+                creature.style.left = `${x - 20}px`;
+                creature.style.top = `${y - 20}px`;
+                
+                const creatureData = {
+                    element: creature,
+                    type: type,
+                    x: x,
+                    y: y,
+                    vx: (Math.random() - 0.5) * 2,
+                    vy: (Math.random() - 0.5) * 2,
+                    energy: 100,
+                    age: 0
+                };
+                
+                this.creatures.push(creatureData);
+                this.ecosystem.appendChild(creature);
+                this.updateCounts();
+
+                creature.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    this.removeCreature(creatureData);
+                });
+            }
+
+            addPlant(type, x, y) {
+                const plant = document.createElement('div');
+                plant.className = `plant ${type}`;
+                
+                if (type === 'grass') plant.className = 'plant grass-patch';
+                
+                plant.style.left = `${x - 20}px`;
+                plant.style.top = `${y - 25}px`;
+                
+                const plantData = {
+                    element: plant,
+                    type: type,
+                    x: x,
+                    y: y,
+                    growth: 100,
+                    age: 0
+                };
+                
+                this.plants.push(plantData);
+                this.ecosystem.appendChild(plant);
+                this.updateCounts();
+
+                plant.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    this.removePlant(plantData);
+                });
+            }
+
+            removeCreature(creature) {
+                const index = this.creatures.indexOf(creature);
+                if (index > -1) {
+                    this.creatures.splice(index, 1);
+                    creature.element.remove();
+                    this.updateCounts();
+                }
+            }
+
+            removePlant(plant) {
+                const index = this.plants.indexOf(plant);
+                if (index > -1) {
+                    this.plants.splice(index, 1);
+                    plant.element.remove();
+                    this.updateCounts();
+                }
+            }
+
+            updateCounts() {
+                document.getElementById('creature-count').textContent = `Animals: ${this.creatures.length}`;
+                document.getElementById('plant-count').textContent = `Plants: ${this.plants.length}`;
+                this.updateStats();
+            }
+
+            updateStats() {
+                const statAnimals = document.getElementById('stat-animals');
+                const statPlants = document.getElementById('stat-plants');
+                const statBiodiversity = document.getElementById('stat-biodiversity');
+                const statHealth = document.getElementById('stat-health');
+
+                if (statAnimals) statAnimals.textContent = this.creatures.length;
+                if (statPlants) statPlants.textContent = this.plants.length;
+                
+                const animalTypes = new Set(this.creatures.map(c => c.type));
+                const plantTypes = new Set(this.plants.map(p => p.type));
+                const biodiversity = animalTypes.size + plantTypes.size;
+                if (statBiodiversity) statBiodiversity.textContent = biodiversity;
+
+                let health = 'Poor';
+                const total = this.creatures.length + this.plants.length;
+                if (total > 20 && biodiversity > 4) health = 'Excellent';
+                else if (total > 10 && biodiversity > 2) health = 'Good';
+                else if (total > 5) health = 'Fair';
+                if (statHealth) statHealth.textContent = health;
+
+                const detailedStats = document.getElementById('detailed-stats');
+                if (detailedStats) {
+                    const animalCounts = {};
+                    const plantCounts = {};
+                    
+                    this.creatures.forEach(c => {
+                        animalCounts[c.type] = (animalCounts[c.type] || 0) + 1;
+                    });
+                    
+                    this.plants.forEach(p => {
+                        plantCounts[p.type] = (plantCounts[p.type] || 0) + 1;
+                    });
+
+                    let html = '<div class="modal-grid">';
+                    if (Object.keys(animalCounts).length > 0) {
+                        html += '<div class="info-card"><h4>Animal Populations</h4>';
+                        Object.entries(animalCounts).forEach(([type, count]) => {
+                            html += `<p>${type.charAt(0).toUpperCase() + type.slice(1)}: ${count}</p>`;
+                        });
+                        html += '</div>';
+                    }
+                    
+                    if (Object.keys(plantCounts).length > 0) {
+                        html += '<div class="info-card"><h4>Plant Populations</h4>';
+                        Object.entries(plantCounts).forEach(([type, count]) => {
+                            html += `<p>${type.charAt(0).toUpperCase() + type.slice(1)}: ${count}</p>`;
+                        });
+                        html += '</div>';
+                    }
+                    html += '</div>';
+                    
+                    detailedStats.innerHTML = html;
+                }
+            }
+
+            changeTerrain(terrain) {
+                this.ecosystem.className = `ecosystem-view terrain-${terrain}`;
+                this.currentTerrain = terrain;
+            }
+
+            updateWeather() {
+                document.querySelectorAll('.rain').forEach(drop => drop.remove());
+                
+                if (this.weather.rain > 0
+                  ) {
+                   const rainCount = Math.floor(this.weather.rain / 10);
+                   for (let i = 0; i < rainCount; i++) {
+                       setTimeout(() => {
+                           const drop = document.createElement('div');
+                           drop.className = 'rain';
+                           drop.style.left = `${Math.random() * 100}%`;
+                           drop.style.animationDuration = `${0.5 + Math.random() * 0.5}s`;
+                           drop.style.animationDelay = `${Math.random() * 2}s`;
+                           this.ecosystem.appendChild(drop);
+                           
+                           setTimeout(() => drop.remove(), 2000);
+                       }, i * 200);
+                   }
+               }
+               
+               const sun = document.getElementById('sun');
+               const brightness = this.weather.temperature > 25 ? 1 : this.weather.temperature / 25;
+               sun.style.opacity = 1 - (this.weather.rain / 100);
+               sun.style.transform = `scale(${0.8 + brightness * 0.4})`;
+           }
+
+           updateModalWeather() {
+               const modalTemp = document.getElementById('modal-temp');
+               const modalRain = document.getElementById('modal-rain');
+               const weatherType = document.getElementById('weather-type');
+               
+               if (modalTemp) modalTemp.textContent = this.weather.temperature;
+               if (modalRain) modalRain.textContent = this.weather.rain;
+               
+               if (weatherType) {
+                   let type = 'Sunny';
+                   if (this.weather.rain > 70) type = 'Heavy Rain';
+                   else if (this.weather.rain > 40) type = 'Rainy';
+                   else if (this.weather.rain > 10) type = 'Cloudy';
+                   else if (this.weather.temperature > 30) type = 'Hot';
+                   else if (this.weather.temperature < 5) type = 'Cold';
+                   weatherType.textContent = type;
+               }
+           }
+
+           updateVegetation() {
+               this.plants.forEach(plant => {
+                   plant.growth = Math.min(100, plant.growth + (this.vegetationDensity - 50) / 10);
+                   const scale = 0.5 + (plant.growth / 100) * 0.5;
+                   plant.element.style.transform = `scale(${scale})`;
+               });
+           }
+
+           moveCreatures() {
+               const bounds = this.ecosystem.getBoundingClientRect();
+               
+               this.creatures.forEach(creature => {
+                   creature.x += creature.vx;
+                   creature.y += creature.vy;
+                   creature.age += 0.01;
+                   
+                   if (creature.x <= 20 || creature.x >= bounds.width - 20) {
+                       creature.vx = -creature.vx;
+                   }
+                   if (creature.y <= 20 || creature.y >= bounds.height - 20) {
+                       creature.vy = -creature.vy;
+                   }
+                   
+                   if (Math.random() < 0.02) {
+                       creature.vx = (Math.random() - 0.5) * 2;
+                       creature.vy = (Math.random() - 0.5) * 2;
+                   }
+                   
+                   if (this.weather.rain > 50) {
+                       creature.vx *= 0.8;
+                       creature.vy *= 0.8;
+                   }
+                   
+                   if (creature.type === 'bird' && this.weather.temperature > 20 && this.weather.rain < 30) {
+                       creature.vy -= 0.1;
+                   }
+                   
+                   creature.element.style.left = `${creature.x - 20}px`;
+                   creature.element.style.top = `${creature.y - 20}px`;
+                   
+                   if (creature.type === 'rabbit' || creature.type === 'deer') {
+                       this.plants.forEach(plant => {
+                           const distance = Math.sqrt(
+                               Math.pow(creature.x - plant.x, 2) + 
+                               Math.pow(creature.y - plant.y, 2)
+                           );
+                           if (distance < 30 && plant.growth > 20) {
+                               plant.growth -= 0.5;
+                               creature.energy = Math.min(100, creature.energy + 0.2);
+                           }
+                       });
+                   }
+               });
+           }
+
+           startSimulation() {
+               setInterval(() => {
+                   this.moveCreatures();
+                   this.updateStats();
+               }, 50);
+           }
+       }
+
+       let simulator;
+
+       function openAnimalModal(type) {
+           simulator.currentAnimal = type;
+           const modal = document.getElementById('animalModal');
+           const title = document.getElementById('animalTitle');
+           const content = document.getElementById('animalContent');
+           
+           const animalInfo = {
+               rabbit: {
+                   title: '🐰 Rabbit',
+                   content: `
+                       <div class="info-card">
+                           <h4>Characteristics</h4>
+                           <p>Small herbivorous mammal that feeds on grass and vegetation. Rabbits are quick and agile, often seen hopping around the ecosystem.</p>
+                       </div>
+                       <div class="modal-grid">
+                           <div class="info-card">
+                               <h4>Diet</h4>
+                               <p>• Grass patches</p>
+                               <p>• Bush leaves</p>
+                               <p>• Small plants</p>
+                           </div>
+                           <div class="info-card">
+                               <h4>Behavior</h4>
+                               <p>• Fast, erratic movement</p>
+                               <p>• Seeks vegetation</p>
+                               <p>• Weather sensitive</p>
+                           </div>
+                       </div>
+                   `
+               },
+               bird: {
+                   title: '🦅 Bird',
+                   content: `
+                       <div class="info-card">
+                           <h4>Characteristics</h4>
+                           <p>Aerial species that flies throughout the ecosystem. Birds are affected by weather conditions and prefer clear skies.</p>
+                       </div>
+                       <div class="modal-grid">
+                           <div class="info-card">
+                               <h4>Diet</h4>
+                               <p>• Seeds from plants</p>
+                               <p>• Small insects</p>
+                               <p>• Tree fruits</p>
+                           </div>
+                           <div class="info-card">
+                               <h4>Behavior</h4>
+                               <p>• Flies higher in good weather</p>
+                               <p>• Avoids heavy rain</p>
+                               <p>• Migrates with temperature</p>
+                           </div>
+                       </div>
+                   `
+               },
+               deer: {
+                   title: '🦌 Deer',
+                   content: `
+                       <div class="info-card">
+                           <h4>Characteristics</h4>
+                           <p>Large herbivorous mammal that grazes on various vegetation. Deer are gentle creatures that roam slowly through the ecosystem.</p>
+                       </div>
+                       <div class="modal-grid">
+                           <div class="info-card">
+                               <h4>Diet</h4>
+                               <p>• Tree leaves</p>
+                               <p>• Grass and shrubs</p>
+                               <p>• Bushes and saplings</p>
+                           </div>
+                           <div class="info-card">
+                               <h4>Behavior</h4>
+                               <p>• Slow, graceful movement</p>
+                               <p>• Prefers forested areas</p>
+                               <p>• Social grazing patterns</p>
+                           </div>
+                       </div>
+                   `
+               },
+               fox: {
+                   title: '🦊 Fox',
+                   content: `
+                       <div class="info-card">
+                           <h4>Characteristics</h4>
+                           <p>Cunning predator that hunts smaller animals. Foxes are adaptable and can thrive in various terrain types.</p>
+                       </div>
+                       <div class="modal-grid">
+                           <div class="info-card">
+                               <h4>Diet</h4>
+                               <p>• Small mammals (rabbits)</p>
+                               <p>• Birds and eggs</p>
+                               <p>• Occasional vegetation</p>
+                           </div>
+                           <div class="info-card">
+                               <h4>Behavior</h4>
+                               <p>• Stealthy hunting</p>
+                               <p>• Territorial movement</p>
+                               <p>• Weather adaptable</p>
+                           </div>
+                       </div>
+                   `
+               }
+           };
+           
+           title.textContent = animalInfo[type].title;
+           content.innerHTML = animalInfo[type].content;
+           modal.style.display = 'block';
+       }
+
+       function openPlantModal(type) {
+           simulator.currentPlant = type;
+           const modal = document.getElementById('plantModal');
+           const title = document.getElementById('plantTitle');
+           const content = document.getElementById('plantContent');
+           
+           const plantInfo = {
+               tree: {
+                   title: '🌳 Tree',
+                   content: `
+                       <div class="info-card">
+                           <h4>Characteristics</h4>
+                           <p>Large woody plant that provides shade and food. Trees are the foundation of forest ecosystems and support many animal species.</p>
+                       </div>
+                       <div class="modal-grid">
+                           <div class="info-card">
+                               <h4>Growth Requirements</h4>
+                               <p>• Moderate to high rainfall</p>
+                               <p>• Temperature 10-30°C</p>
+                               <p>• Good soil conditions</p>
+                           </div>
+                           <div class="info-card">
+                               <h4>Ecosystem Role</h4>
+                               <p>• Provides shelter</p>
+                               <p>• Produces oxygen</p>
+                               <p>• Food source for herbivores</p>
+                           </div>
+                       </div>
+                   `
+               },
+               bush: {
+                   title: '🌿 Bush',
+                   content: `
+                       <div class="info-card">
+                           <h4>Characteristics</h4>
+                           <p>Medium-sized shrub that grows quickly and provides cover. Bushes are hardy plants that can survive in various conditions.</p>
+                       </div>
+                       <div class="modal-grid">
+                           <div class="info-card">
+                               <h4>Growth Requirements</h4>
+                               <p>• Low to moderate water</p>
+                               <p>• Temperature 5-35°C</p>
+                               <p>• Adaptable to most soils</p>
+                           </div>
+                           <div class="info-card">
+                               <h4>Ecosystem Role</h4>
+                               <p>• Quick ground cover</p>
+                               <p>• Nesting sites for birds</p>
+                               <p>• Food for small mammals</p>
+                           </div>
+                       </div>
+                   `
+               },
+               grass: {
+                   title: '🌱 Grass',
+                   content: `
+                       <div class="info-card">
+                           <h4>Characteristics</h4>
+                           <p>Fast-growing ground cover that forms the base of many food chains. Grass is essential for herbivorous animals.</p>
+                       </div>
+                       <div class="modal-grid">
+                           <div class="info-card">
+                               <h4>Growth Requirements</h4>
+                               <p>• Regular rainfall</p>
+                               <p>• Temperature 0-40°C</p>
+                               <p>• Spreads naturally</p>
+                           </div>
+                           <div class="info-card">
+                               <h4>Ecosystem Role</h4>
+                               <p>• Primary food source</p>
+                               <p>• Prevents soil erosion</p>
+                               <p>• Supports grazing animals</p>
+                           </div>
+                       </div>
+                   `
+               }
+           };
+           
+           title.textContent = plantInfo[type].title;
+           content.innerHTML = plantInfo[type].content;
+           modal.style.display = 'block';
+       }
+
+       function openWeatherModal() {
+           const modal = document.getElementById('weatherModal');
+           simulator.updateModalWeather();
+           modal.style.display = 'block';
+       }
+
+       function openTerrainModal(terrain) {
+           simulator.currentTerrainModal = terrain;
+           const modal = document.getElementById('terrainModal');
+           const title = document.getElementById('terrainTitle');
+           const content = document.getElementById('terrainContent');
+           
+           const terrainInfo = {
+               grass: {
+                   title: '🌾 Grassland Terrain',
+                   content: `
+                       <div class="info-card">
+                           <h4>Characteristics</h4>
+                           <p>Open grassland with scattered vegetation. Ideal for grazing animals and supports diverse wildlife populations.</p>
+                       </div>
+                       <div class="modal-grid">
+                           <div class="info-card">
+                               <h4>Best For</h4>
+                               <p>• Rabbits and deer</p>
+                               <p>• Grass and bush growth</p>
+                               <p>• Balanced ecosystems</p>
+                           </div>
+                           <div class="info-card">
+                               <h4>Climate</h4>
+                               <p>• Moderate rainfall needed</p>
+                               <p>• Temperature: 10-25°C</p>
+                               <p>• Seasonal variations</p>
+                           </div>
+                       </div>
+                   `
+               },
+               desert: {
+                   title: '🏜️ Desert Terrain',
+                   content: `
+                       <div class="info-card">
+                           <h4>Characteristics</h4>
+                           <p>Arid environment with sparse vegetation. Only the most adaptable species can survive in these harsh conditions.</p>
+                       </div>
+                       <div class="modal-grid">
+                           <div class="info-card">
+                               <h4>Best For</h4>
+                               <p>• Hardy shrubs</p>
+                               <p>• Desert-adapted animals</p>
+                               <p>• Specialized ecosystems</p>
+                           </div>
+                           <div class="info-card">
+                               <h4>Climate</h4>
+                               <p>• Very low rainfall</p>
+                               <p>• High temperatures</p>
+                               <p>• Extreme conditions</p>
+                           </div>
+                       </div>
+                   `
+               },
+               forest: {
+                   title: '🌲 Forest Terrain',
+                   content: `
+                       <div class="info-card">
+                           <h4>Characteristics</h4>
+                           <p>Dense woodland environment rich in biodiversity. Supports complex food webs and numerous species interactions.</p>
+                       </div>
+                       <div class="modal-grid">
+                           <div class="info-card">
+                               <h4>Best For</h4>
+                               <p>• Trees and large plants</p>
+                               <p>• Deer and forest animals</p>
+                               <p>• High biodiversity</p>
+                           </div>
+                           <div class="info-card">
+                               <h4>Climate</h4>
+                               <p>• High rainfall</p>
+                               <p>• Moderate temperatures</p>
+                               <p>• Humid conditions</p>
+                           </div>
+                       </div>
+                   `
+               },
+               water: {
+                   title: '💧 Wetland Terrain',
+                   content: `
+                       <div class="info-card">
+                           <h4>Characteristics</h4>
+                           <p>Water-rich environment supporting aquatic and semi-aquatic species. Critical habitat for many wildlife species.</p>
+                       </div>
+                       <div class="modal-grid">
+                           <div class="info-card">
+                               <h4>Best For</h4>
+                               <p>• Water-loving plants</p>
+                               <p>• Birds and amphibians</p>
+                               <p>• Unique ecosystems</p>
+                           </div>
+                           <div class="info-card">
+                               <h4>Climate</h4>
+                               <p>• Very high rainfall</p>
+                               <p>• Consistent moisture</p>
+                               <p>• Stable temperatures</p>
+                           </div>
+                       </div>
+                   `
+               }
+           };
+           
+           title.textContent = terrainInfo[terrain].title;
+           content.innerHTML = terrainInfo[terrain].content;
+           modal.style.display = 'block';
+       }
+
+       function openStatsModal() {
+           const modal = document.getElementById('statsModal');
+           simulator.updateStats();
+           modal.style.display = 'block';
+       }
+
+       function openHelpModal() {
+           const modal = document.getElementById('helpModal');
+           modal.style.display = 'block';
+       }
+
+       function closeModal(modalId) {
+           document.getElementById(modalId).style.display = 'none';
+       }
+
+       function selectAnimalForPlacement() {
+           if (simulator.currentAnimal) {
+               document.querySelectorAll('.creature-btn, .plant-btn').forEach(b => b.classList.remove('selected'));
+               document.querySelector(`[data-type="${simulator.currentAnimal}"]`).classList.add('selected');
+               simulator.selectedItem = { type: 'creature', subtype: simulator.currentAnimal };
+               closeModal('animalModal');
+           }
+       }
+
+       function selectPlantForPlacement() {
+           if (simulator.currentPlant) {
+               document.querySelectorAll('.creature-btn, .plant-btn').forEach(b => b.classList.remove('selected'));
+               document.querySelector(`[data-type="${simulator.currentPlant}"]`).classList.add('selected');
+               simulator.selectedItem = { type: 'plant', subtype: simulator.currentPlant };
+               closeModal('plantModal');
+           }
+       }
+
+       function selectTerrain() {
+           if (simulator.currentTerrainModal) {
+               document.querySelectorAll('.terrain-btn').forEach(b => b.classList.remove('active'));
+               document.querySelector(`[data-terrain="${simulator.currentTerrainModal}"]`).classList.add('active');
+               simulator.changeTerrain(simulator.currentTerrainModal);
+               closeModal('terrainModal');
+           }
+       }
+
+       function setRandomWeather() {
+           const rain = Math.floor(Math.random() * 100);
+           const temp = Math.floor(Math.random() * 50) - 10;
+           
+           document.getElementById('rain-slider').value = rain;
+           document.getElementById('temp-slider').value = temp;
+           
+           simulator.weather.rain = rain;
+           simulator.weather.temperature = temp;
+           
+           document.getElementById('rain-value').textContent = rain;
+           document.getElementById('temp-value').textContent = temp;
+           
+           simulator.updateWeather();
+           simulator.updateModalWeather();
+       }
+
+       function setStormWeather() {
+           document.getElementById('rain-slider').value = 90;
+           document.getElementById('temp-slider').value = 15;
+           
+           simulator.weather.rain = 90;
+           simulator.weather.temperature = 15;
+           
+           document.getElementById('rain-value').textContent = '90';
+           document.getElementById('temp-value').textContent = '15';
+           
+           simulator.updateWeather();
+           simulator.updateModalWeather();
+       }
+
+       function setClearWeather() {
+           document.getElementById('rain-slider').value = 0;
+           document.getElementById('temp-slider').value = 25;
+           
+           simulator.weather.rain = 0;
+           simulator.weather.temperature = 25;
+           
+           document.getElementById('rain-value').textContent = '0';
+           document.getElementById('temp-value').textContent = '25';
+           
+           simulator.updateWeather();
+           simulator.updateModalWeather();
+       }
+
+       function clearEcosystem() {
+           if (confirm('Are you sure you want to clear all animals and plants?')) {
+               simulator.creatures.forEach(creature => creature.element.remove());
+               simulator.plants.forEach(plant => plant.element.remove());
+               simulator.creatures = [];
+               simulator.plants = [];
+               simulator.updateCounts();
+               closeModal('statsModal');
+           }
+       }
+
+       function generateRandomEcosystem() {
+           clearEcosystem();
+           
+           const animalTypes = ['rabbit', 'bird', 'deer', 'fox'];
+           const plantTypes = ['tree', 'bush', 'grass'];
+           const bounds = simulator.ecosystem.getBoundingClientRect();
+           
+           for (let i = 0; i < 15; i++) {
+               const type = plantTypes[Math.floor(Math.random() * plantTypes.length)];
+               const x = Math.random() * (bounds.width - 100) + 50;
+               const y = Math.random() * (bounds.height - 100) + 50;
+               simulator.addPlant(type, x, y);
+           }
+           
+           for (let i = 0; i < 10; i++) {
+               const type = animalTypes[Math.floor(Math.random() * animalTypes.length)];
+               const x = Math.random() * (bounds.width - 100) + 50;
+               const y = Math.random() * (bounds.height - 100) + 50;
+               simulator.addCreature(type, x, y);
+           }
+           
+           closeModal('statsModal');
+       }
+
+       window.onclick = function(event) {
+           const modals = document.querySelectorAll('.modal');
+           modals.forEach(modal => {
+               if (event.target === modal) {
+                   modal.style.display = 'none';
+               }
+           });
+       }
+
+       document.addEventListener('DOMContentLoaded', () => {
+           simulator = new EcosystemSimulator();
+       });
+   </script>
+</body>
+</html>
