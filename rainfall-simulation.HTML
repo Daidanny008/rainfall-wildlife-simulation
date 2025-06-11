@@ -981,6 +981,10 @@
                 line-height: 1.75rem;
             }
         }
+
+        .deer-icon svg {
+            transform: translate(-12px, -12px);
+        }
     </style>
 </head>
 
@@ -2124,7 +2128,8 @@
                         html +=
                             '<div class="bg-green-50 p-4 rounded-lg"><h4 class="font-semibold text-green-700 mb-2">Animal Populations</h4><div class="grid grid-cols-2 gap-2">';
                         Object.entries(animalCounts).forEach(([type, count]) => {
-                            html += `<div class="flex items-center gap-2"><div class="w-6 h-6">${this.getCreatureSVG(type)}</div> <span class="text-sm">${type.charAt(0).toUpperCase() + type.slice(1)}: ${count}</span></div>`;
+                            html += `<div class="flex items-center gap-2"><div class="w-6 h-6 ${type === 'deer' ? 'deer-icon' : ''}">${this.getCreatureSVG(type)}</div> <span class="text-sm">${type.charAt(0).toUpperCase() + type.slice(1)}: ${count}</span></div>`;
+                            //html += `<div class="flex items-center gap-2"><div class="w-6 h-6">${this.getCreatureSVG(type)}</div> <span class="text-sm">${type.charAt(0).toUpperCase() + type.slice(1)}: ${count}</span></div>`;
                         });
                         html += "</div></div>";
                     }
