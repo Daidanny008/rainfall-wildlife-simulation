@@ -1938,6 +1938,8 @@
                     fox: ["rabbit", "bird"],
                     bird: ["grass"]
                 };
+                this.reproductionThreshold = 3; // How many prey/plants needed to reproduce
+                this.autoPlantInterval = 10000; // Auto-generate plants every 10 seconds
 
                 this.init();
             }
@@ -1946,6 +1948,7 @@
                 this.setupEventListeners();
                 this.startSimulation();
                 this.updateStats();
+                setInterval(() => this.generateRandomPlant(), this.autoPlantInterval);
             }
 
             setupEventListeners() {
@@ -2086,6 +2089,17 @@
                     e.stopPropagation();
                     this.removePlant(plantData);
                 });
+            }
+
+            generateRandomPlant() {
+                if (this.plants.length < 50) { // Limit total plants
+                    const bounds = this.ecosystem.getBoundingClientRect();
+                    const plantTypes = ["grass", "bush", "tree"];
+                    const type = plantTypes[Math.floor(Math.random() * plantTypes.length)];
+                    const x = Math.random() * (bounds.width - 100) + 50;
+                    const y = Math.random() * (bounds.height - 100) + 50;
+                    this.addPlant(type, x, y);
+                }
             }
 
             getCreatureSVG(type) {
@@ -2323,12 +2337,15 @@
             }
 
             checkCollisions(creature) {
+                // Add a counter for how much this creature has eaten
+                if (!creature.eatenCount) creature.eatenCount = 0;
+
                 // Define diets for each creature type
                 const diets = {
-                    rabbit: ["grass", "bush"], // Rabbits eat plants
-                    deer: ["grass", "bush", "tree"], // Deer eat plants
-                    fox: ["rabbit", "bird"], // Foxes eat small animals
-                    bird: ["grass"] // Birds eat seeds/plants
+                    rabbit: ["grass", "bush"],
+                    deer: ["grass", "bush", "tree"],
+                    fox: ["rabbit", "bird"],
+                    bird: ["grass"]
                 };
 
                 // Check for plant collisions if creature is herbivore
@@ -2340,16 +2357,19 @@
                                 Math.pow(creature.y - plant.y, 2)
                             );
                             
-                            if (distance < 30) { // Collision distance
-                                // Reduce plant growth or remove it
-                                plant.growth -= 10; // More significant impact
+                            if (distance < 30) {
+                                plant.growth -= 10;
                                 creature.energy = Math.min(100, creature.energy + 5);
+                                creature.eatenCount += 0.5; // Plants count as half for reproduction
                                 
                                 if (plant.growth <= 0) {
                                     this.plants.splice(plantIndex, 1);
                                     plant.element.remove();
                                     this.updateCounts();
                                 }
+
+                                // Check for reproduction
+                                this.checkReproduction(creature);
                             }
                         }
                     });
@@ -2358,7 +2378,6 @@
                 // Check for creature collisions if creature is carnivore
                 if (diets[creature.type].some(food => ["rabbit", "bird", "fox", "deer"].includes(food))) {
                     this.creatures.forEach((otherCreature, creatureIndex) => {
-                        // Don't check collision with self
                         if (creature === otherCreature) return;
                         
                         if (diets[creature.type].includes(otherCreature.type)) {
@@ -2367,17 +2386,37 @@
                                 Math.pow(creature.y - otherCreature.y, 2)
                             );
                             
-                            if (distance < 30) { // Collision distance
-                                // Remove the prey and increase predator's energy
+                            if (distance < 30) {
                                 this.creatures.splice(creatureIndex, 1);
                                 otherCreature.element.remove();
                                 creature.energy = Math.min(100, creature.energy + 20);
+                                creature.eatenCount += 1; // Prey counts as full for reproduction
                                 this.updateCounts();
+
+                                // Check for reproduction
+                                this.checkReproduction(creature);
                             }
                         }
                     });
                 }
             }
+
+            checkReproduction(creature) {
+                if (creature.eatenCount >= this.reproductionThreshold) {
+                    // Reset counter
+                    creature.eatenCount = 0;
+                    
+                    // Create offspring near parent
+                    const bounds = this.ecosystem.getBoundingClientRect();
+                    const offsetX = (Math.random() * 60) - 30;
+                    const offsetY = (Math.random() * 60) - 30;
+                    const newX = Math.max(20, Math.min(bounds.width - 20, creature.x + offsetX));
+                    const newY = Math.max(20, Math.min(bounds.height - 20, creature.y + offsetY));
+                    
+                    this.addCreature(creature.type, newX, newY);
+                }
+            }
+
             startSimulation() {
                 setInterval(() => {
                     this.moveCreatures();
