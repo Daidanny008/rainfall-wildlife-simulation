@@ -1882,6 +1882,12 @@
                 this.rainInterval = null;
                 this.lastRainDropTime = 0;
                 this.rainDropDelay = 0;
+                this.diets = {
+                    rabbit: ["grass", "bush"],
+                    deer: ["grass", "bush", "tree"],
+                    fox: ["rabbit", "bird"],
+                    bird: ["grass"]
+                };
 
                 this.init();
             }
@@ -2234,6 +2240,7 @@
                     creature.y += creature.vy;
                     creature.age += 0.01;
 
+                    // Boundary checks
                     if (creature.x <= 20 || creature.x >= bounds.width - 20) {
                         creature.vx = -creature.vx;
                     }
@@ -2241,42 +2248,86 @@
                         creature.vy = -creature.vy;
                     }
 
+                    // Random direction change
                     if (Math.random() < 0.02) {
                         creature.vx = (Math.random() - 0.5) * 2;
                         creature.vy = (Math.random() - 0.5) * 2;
                     }
 
+                    // Weather effects
                     if (this.weather.rain > 50) {
                         creature.vx *= 0.8;
                         creature.vy *= 0.8;
                     }
 
-                    if (
-                        creature.type === "bird" &&
-                        this.weather.temperature > 20 &&
-                        this.weather.rain < 30
-                    ) {
+                    if (creature.type === "bird" && this.weather.temperature > 20 && this.weather.rain < 30) {
                         creature.vy -= 0.1;
                     }
 
                     creature.element.style.left = `${creature.x - 20}px`;
                     creature.element.style.top = `${creature.y - 20}px`;
 
-                    if (creature.type === "rabbit" || creature.type === "deer") {
-                        this.plants.forEach((plant) => {
-                            const distance = Math.sqrt(
-                                Math.pow(creature.x - plant.x, 2) +
-                                Math.pow(creature.y - plant.y, 2),
-                            );
-                            if (distance < 30 && plant.growth > 20) {
-                                plant.growth -= 0.5;
-                                creature.energy = Math.min(100, creature.energy + 0.2);
-                            }
-                        });
-                    }
+                    // Check for collisions with other creatures and plants
+                    this.checkCollisions(creature);
                 });
             }
 
+            checkCollisions(creature) {
+                // Define diets for each creature type
+                const diets = {
+                    rabbit: ["grass", "bush"], // Rabbits eat plants
+                    deer: ["grass", "bush", "tree"], // Deer eat plants
+                    fox: ["rabbit", "bird"], // Foxes eat small animals
+                    bird: ["grass"] // Birds eat seeds/plants
+                };
+
+                // Check for plant collisions if creature is herbivore
+                if (diets[creature.type].some(food => ["grass", "bush", "tree"].includes(food))) {
+                    this.plants.forEach((plant, plantIndex) => {
+                        if (diets[creature.type].includes(plant.type)) {
+                            const distance = Math.sqrt(
+                                Math.pow(creature.x - plant.x, 2) +
+                                Math.pow(creature.y - plant.y, 2)
+                            );
+                            
+                            if (distance < 30) { // Collision distance
+                                // Reduce plant growth or remove it
+                                plant.growth -= 10; // More significant impact
+                                creature.energy = Math.min(100, creature.energy + 5);
+                                
+                                if (plant.growth <= 0) {
+                                    this.plants.splice(plantIndex, 1);
+                                    plant.element.remove();
+                                    this.updateCounts();
+                                }
+                            }
+                        }
+                    });
+                }
+
+                // Check for creature collisions if creature is carnivore
+                if (diets[creature.type].some(food => ["rabbit", "bird", "fox", "deer"].includes(food))) {
+                    this.creatures.forEach((otherCreature, creatureIndex) => {
+                        // Don't check collision with self
+                        if (creature === otherCreature) return;
+                        
+                        if (diets[creature.type].includes(otherCreature.type)) {
+                            const distance = Math.sqrt(
+                                Math.pow(creature.x - otherCreature.x, 2) +
+                                Math.pow(creature.y - otherCreature.y, 2)
+                            );
+                            
+                            if (distance < 30) { // Collision distance
+                                // Remove the prey and increase predator's energy
+                                this.creatures.splice(creatureIndex, 1);
+                                otherCreature.element.remove();
+                                creature.energy = Math.min(100, creature.energy + 20);
+                                this.updateCounts();
+                            }
+                        }
+                    });
+                }
+            }
             startSimulation() {
                 setInterval(() => {
                     this.moveCreatures();
