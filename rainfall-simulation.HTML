@@ -612,31 +612,10 @@
             margin-bottom: calc(1rem * var(--tw-space-y-reverse));
         }
 
+        /* scrollbar styles */
         .overflow-y-auto {
             overflow-y: scroll;
-            height: 100%;
-            scrollbar-width: thin; /* For Firefox */
-            scrollbar-color: #9ca3af #f3f4f6; /* For Firefox */
-            /* Add these lines to force scrollbar visibility in WebKit browsers */
-            -webkit-overflow-scrolling: touch;
-            overflow: overlay; /* This makes scrollbar appear over content */
-        }
-
-        /* For WebKit browsers (Chrome, Safari) */
-        .overflow-y-auto::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
-            background-color: transparent;
-        }
-
-        .overflow-y-auto::-webkit-scrollbar-track {
-            background: #f3f4f6;
-            border-radius: 4px;
-        }
-
-        .overflow-y-auto::-webkit-scrollbar-thumb {
-            background-color: #9ca3af;
-            border-radius: 4px;
+            height: auto;
         }
 
         .rounded-full {
@@ -1001,24 +980,24 @@
             }
         }
 
+        /* fixing deer icon position to match other SVGs in ecosystem statistics modal */
         .deer-icon svg {
             transform: translate(-12px, -12px);
         }
 
+        /* Fitting the content view to the screen height minus nav bar and footer heights */
         #content-view {
-            height: calc(100vh - 8rem); /* 100vh minus navbar (4rem) and footer (4rem) heights */
-            overflow: hidden; /* Prevent scrolling on the main container */
+            height: calc(100vh - 8rem);
+            /* 100vh minus navbar (4rem) and footer (4rem) heights */
+            overflow: hidden;
+            /* Prevent scrolling on the main container */
         }
 
         .ecosystem-view {
-            height: 100%; /* Take full height of parent */
-            overflow: hidden; /* Prevent scrolling */
-        }
-
-        /* Control panel should scroll */
-        .overflow-y-auto {
-            overflow-y: auto;
-            height: 100%; /* Take full height of parent */
+            height: 100%;
+            /* Take full height of parent */
+            overflow: hidden;
+            /* Prevent scrolling */
         }
 
         /* Footer height */
@@ -1030,7 +1009,6 @@
         nav {
             height: 4rem;
         }
-
     </style>
 </head>
 
@@ -1050,6 +1028,7 @@
             font-family: "Poppins", sans-serif !important;
         }
 
+        /* Natural Rainfall Animation with Horizontal Drift */
         @keyframes rainFall {
             to {
                 transform: translateY(100vh) translateX(var(--rain-x, 50px));
@@ -1932,14 +1911,15 @@
                 this.rainInterval = null;
                 this.lastRainDropTime = 0;
                 this.rainDropDelay = 0;
+                // Preys for each animal type
                 this.diets = {
                     rabbit: ["grass", "bush"],
                     deer: ["grass", "bush", "tree"],
                     fox: ["rabbit", "bird"],
                     bird: ["grass"]
                 };
-                this.reproductionThreshold = 3; // How many prey/plants needed to reproduce
-                this.autoPlantInterval = 10000; // Auto-generate plants every 10 seconds
+                this.reproductionThreshold = 3; // How many prey/plants needed to reproduce for animals
+                this.autoPlantInterval = 5000; // Auto-generate plants every 10 seconds
 
                 this.init();
             }
@@ -1948,10 +1928,11 @@
                 this.setupEventListeners();
                 this.startSimulation();
                 this.updateStats();
-                setInterval(() => this.generateRandomPlant(), this.autoPlantInterval);
+                setInterval(() => this.generateRandomPlant(), this.autoPlantInterval); // generate plants periodically
             }
 
             setupEventListeners() {
+                // Select animal for placement
                 document.querySelectorAll(".creature-btn").forEach((btn) => {
                     btn.addEventListener("click", (e) => {
                         if (!e.target.dataset.type) return;
@@ -1966,6 +1947,7 @@
                     });
                 });
 
+                // Select plant for placement
                 document.querySelectorAll(".plant-btn").forEach((btn) => {
                     btn.addEventListener("click", (e) => {
                         if (!e.target.dataset.type) return;
@@ -1980,6 +1962,7 @@
                     });
                 });
 
+                // On click, place selected animal or plant
                 this.ecosystem.addEventListener("click", (e) => {
                     if (this.selectedItem && e.target === this.ecosystem) {
                         const rect = this.ecosystem.getBoundingClientRect();
@@ -1994,6 +1977,7 @@
                     }
                 });
 
+                // Slider for customizing rain 
                 document
                     .getElementById("rain-slider")
                     .addEventListener("input", (e) => {
@@ -2008,6 +1992,7 @@
                         if (this.rainDropDelay < 5) this.rainDropDelay = 5;
                     });
 
+                // Slider for customizing temperature 
                 document
                     .getElementById("temp-slider")
                     .addEventListener("input", (e) => {
@@ -2018,6 +2003,7 @@
                         this.updateModalWeather();
                     });
 
+                // Slider for vegetation density
                 document
                     .getElementById("vegetation-slider")
                     .addEventListener("input", (e) => {
@@ -2029,6 +2015,7 @@
 
             }
 
+            // Adding an animal
             addCreature(type, x, y) {
                 const creature = document.createElement("div");
                 creature.className = `creature ${type}`;
@@ -2061,6 +2048,7 @@
                 });
             }
 
+            // adding a plant
             addPlant(type, x, y) {
                 const plant = document.createElement("div");
                 plant.className = `plant ${type}`;
@@ -2091,6 +2079,7 @@
                 });
             }
 
+            // Auto generate plants
             generateRandomPlant() {
                 if (this.plants.length < 50) { // Limit total plants
                     const bounds = this.ecosystem.getBoundingClientRect();
@@ -2102,6 +2091,7 @@
                 }
             }
 
+            // shorthand to get SVG for animals
             getCreatureSVG(type) {
                 const svgs = {
                     rabbit:
@@ -2113,6 +2103,7 @@
                 return svgs[type];
             }
 
+            // shorthand to get SVG for plants
             getPlantSVG(type) {
                 const svgs = {
                     tree: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-tree-pine"><path d="m17 14 3 3.3a1 1 0 0 1-.7 1.7H4.7a1 1 0 0 1-.7-1.7L7 14h-.3a1 1 0 0 1-.7-1.7L9 9h-.2A1 1 0 0 1 8 7.3L12 3l4 4.3a1 1 0 0 1-.8 1.7H15l3 3.3a1 1 0 0 1-.7 1.7H17Z"/><path d="M12 22v-3"/></svg>',
@@ -2123,6 +2114,7 @@
                 return svgs[type];
             }
 
+            // Removing a creature
             removeCreature(creature) {
                 const index = this.creatures.indexOf(creature);
                 if (index > -1) {
@@ -2132,6 +2124,7 @@
                 }
             }
 
+            // removing a plant
             removePlant(plant) {
                 const index = this.plants.indexOf(plant);
                 if (index > -1) {
@@ -2141,6 +2134,7 @@
                 }
             }
 
+            // update animal/plant counts
             updateCounts() {
                 document.getElementById("creature-count").textContent =
                     `Animals: ${this.creatures.length}`;
@@ -2149,6 +2143,7 @@
                 this.updateStats();
             }
 
+            // Update ecosystem statistics
             updateStats() {
                 const statAnimals = document.getElementById("stat-animals");
                 const statPlants = document.getElementById("stat-plants");
@@ -2207,11 +2202,13 @@
                 }
             }
 
+            // Change current terrain
             changeTerrain(terrain) {
                 this.ecosystem.className = `ecosystem-view terrain-${terrain} rounded-xl shadow-lg flex-1 relative overflow-hidden`;
                 this.currentTerrain = terrain;
             }
 
+            // Change weather, especially rain and temperature
             updateWeather() {
                 // Clear existing rain
                 document
@@ -2236,6 +2233,7 @@
                 }
             }
 
+            // Create individual rain drops
             createRainDrops() {
                 const now = Date.now();
                 if (now - this.lastRainDropTime > this.rainDropDelay) {
@@ -2266,6 +2264,7 @@
                 }
             }
 
+            // Update modal weather information
             updateModalWeather() {
                 const modalTemp = document.getElementById("modal-temp");
                 const modalRain = document.getElementById("modal-rain");
@@ -2285,6 +2284,7 @@
                 }
             }
 
+            // Update vegetation based on density
             updateVegetation() {
                 this.plants.forEach((plant) => {
                     plant.growth = Math.min(
@@ -2296,6 +2296,7 @@
                 });
             }
 
+            // Move creatures and handle interactions
             moveCreatures() {
                 const bounds = this.ecosystem.getBoundingClientRect();
 
@@ -2336,6 +2337,7 @@
                 });
             }
 
+            // Check predatory-prey interactions and plant consumptions
             checkCollisions(creature) {
                 // Add a counter for how much this creature has eaten
                 if (!creature.eatenCount) creature.eatenCount = 0;
@@ -2356,12 +2358,12 @@
                                 Math.pow(creature.x - plant.x, 2) +
                                 Math.pow(creature.y - plant.y, 2)
                             );
-                            
+
                             if (distance < 30) {
                                 plant.growth -= 10;
                                 creature.energy = Math.min(100, creature.energy + 5);
                                 creature.eatenCount += 0.5; // Plants count as half for reproduction
-                                
+
                                 if (plant.growth <= 0) {
                                     this.plants.splice(plantIndex, 1);
                                     plant.element.remove();
@@ -2379,13 +2381,13 @@
                 if (diets[creature.type].some(food => ["rabbit", "bird", "fox", "deer"].includes(food))) {
                     this.creatures.forEach((otherCreature, creatureIndex) => {
                         if (creature === otherCreature) return;
-                        
+
                         if (diets[creature.type].includes(otherCreature.type)) {
                             const distance = Math.sqrt(
                                 Math.pow(creature.x - otherCreature.x, 2) +
                                 Math.pow(creature.y - otherCreature.y, 2)
                             );
-                            
+
                             if (distance < 30) {
                                 this.creatures.splice(creatureIndex, 1);
                                 otherCreature.element.remove();
@@ -2401,22 +2403,24 @@
                 }
             }
 
+            // Check auto plant generation
             checkReproduction(creature) {
                 if (creature.eatenCount >= this.reproductionThreshold) {
                     // Reset counter
                     creature.eatenCount = 0;
-                    
+
                     // Create offspring near parent
                     const bounds = this.ecosystem.getBoundingClientRect();
                     const offsetX = (Math.random() * 60) - 30;
                     const offsetY = (Math.random() * 60) - 30;
                     const newX = Math.max(20, Math.min(bounds.width - 20, creature.x + offsetX));
                     const newY = Math.max(20, Math.min(bounds.height - 20, creature.y + offsetY));
-                    
+
                     this.addCreature(creature.type, newX, newY);
                 }
             }
 
+            // Start the wildlife simulation
             startSimulation() {
                 setInterval(() => {
                     this.moveCreatures();
@@ -2427,6 +2431,7 @@
 
         let simulator;
 
+        // Individual modals for each animal
         function openAnimalModal(type) {
             simulator.currentAnimal = type;
             const modal = document.getElementById("animalModal");
@@ -2562,6 +2567,7 @@
             modal.classList.remove("hidden");
         }
 
+        // Individual modals for each plant
         function openPlantModal(type) {
             simulator.currentPlant = type;
             const modal = document.getElementById("plantModal");
@@ -2667,12 +2673,14 @@
             modal.classList.remove("hidden");
         }
 
+        // Individual modal for rain and temperature
         function openWeatherModal() {
             const modal = document.getElementById("weatherModal");
             simulator.updateModalWeather();
             modal.classList.remove("hidden");
         }
 
+        // Individual modals for each terrain type
         function openTerrainModal(terrain) {
             originalTerrain = simulator.currentTerrain;
             simulator.currentTerrainModal = terrain;
@@ -2796,17 +2804,20 @@
             modal.classList.remove("hidden");
         }
 
+        // Individual modal for stats
         function openStatsModal() {
             const modal = document.getElementById("statsModal");
             simulator.updateStats();
             modal.classList.remove("hidden");
         }
 
+        // Individual modal for help
         function openHelpModal() {
             const modal = document.getElementById("helpModal");
             modal.classList.remove("hidden");
         }
 
+        // closing modals
         function closeModal(modalId) {
             document.getElementById(modalId).classList.add("hidden");
             if (modalId == "terrainModal" && originalTerrain) {
@@ -2815,6 +2826,7 @@
             }
         }
 
+        // Selecting animals for placement
         function selectAnimalForPlacement() {
             if (simulator.currentAnimal) {
                 document
@@ -2831,6 +2843,7 @@
             }
         }
 
+        // Selecting plants for placement
         function selectPlantForPlacement() {
             if (simulator.currentPlant) {
                 document
@@ -2847,6 +2860,7 @@
             }
         }
 
+        // Selecting terrain for placement
         function selectTerrain() {
             if (simulator.currentTerrainModal) {
                 document
@@ -2861,6 +2875,7 @@
             }
         }
 
+        // Get random weather
         function setRandomWeather() {
             const rain = Math.floor(Math.random() * 100);
             const temp = Math.floor(Math.random() * 50) - 10;
@@ -2878,6 +2893,7 @@
             simulator.updateModalWeather();
         }
 
+        // Set weather to stormy
         function setStormWeather() {
             document.getElementById("rain-slider").value = 90;
             document.getElementById("temp-slider").value = 15;
@@ -2892,6 +2908,7 @@
             simulator.updateModalWeather();
         }
 
+        // Clear weather settings to default
         function setClearWeather() {
             document.getElementById("rain-slider").value = 0;
             document.getElementById("temp-slider").value = 25;
@@ -2906,6 +2923,7 @@
             simulator.updateModalWeather();
         }
 
+        // Clear the ecosystem
         function clearEcosystem() {
             if (confirm("Are you sure you want to clear all animals and plants?")) {
                 simulator.creatures.forEach((creature) => creature.element.remove());
@@ -2917,6 +2935,7 @@
             }
         }
 
+        // Generate a random ecosystem
         function generateRandomEcosystem() {
             clearEcosystem();
 
@@ -2943,6 +2962,7 @@
             closeModal("statsModal");
         }
 
+        // Close modals when clicking outside
         window.onclick = function (event) {
             const modals = document.querySelectorAll(".modal");
             modals.forEach((modal) => {
