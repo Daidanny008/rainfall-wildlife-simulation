@@ -612,12 +612,31 @@
             margin-bottom: calc(1rem * var(--tw-space-y-reverse));
         }
 
-        .overflow-hidden {
-            overflow: hidden;
+        .overflow-y-auto {
+            overflow-y: scroll;
+            height: 100%;
+            scrollbar-width: thin; /* For Firefox */
+            scrollbar-color: #9ca3af #f3f4f6; /* For Firefox */
+            /* Add these lines to force scrollbar visibility in WebKit browsers */
+            -webkit-overflow-scrolling: touch;
+            overflow: overlay; /* This makes scrollbar appear over content */
         }
 
-        .overflow-y-auto {
-            overflow-y: auto;
+        /* For WebKit browsers (Chrome, Safari) */
+        .overflow-y-auto::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+            background-color: transparent;
+        }
+
+        .overflow-y-auto::-webkit-scrollbar-track {
+            background: #f3f4f6;
+            border-radius: 4px;
+        }
+
+        .overflow-y-auto::-webkit-scrollbar-thumb {
+            background-color: #9ca3af;
+            border-radius: 4px;
         }
 
         .rounded-full {
@@ -985,6 +1004,33 @@
         .deer-icon svg {
             transform: translate(-12px, -12px);
         }
+
+        #content-view {
+            height: calc(100vh - 8rem); /* 100vh minus navbar (4rem) and footer (4rem) heights */
+            overflow: hidden; /* Prevent scrolling on the main container */
+        }
+
+        .ecosystem-view {
+            height: 100%; /* Take full height of parent */
+            overflow: hidden; /* Prevent scrolling */
+        }
+
+        /* Control panel should scroll */
+        .overflow-y-auto {
+            overflow-y: auto;
+            height: 100%; /* Take full height of parent */
+        }
+
+        /* Footer height */
+        footer {
+            height: 4rem;
+        }
+
+        /* Navbar height */
+        nav {
+            height: 4rem;
+        }
+
     </style>
 </head>
 
@@ -2129,7 +2175,6 @@
                             '<div class="bg-green-50 p-4 rounded-lg"><h4 class="font-semibold text-green-700 mb-2">Animal Populations</h4><div class="grid grid-cols-2 gap-2">';
                         Object.entries(animalCounts).forEach(([type, count]) => {
                             html += `<div class="flex items-center gap-2"><div class="w-6 h-6 ${type === 'deer' ? 'deer-icon' : ''}">${this.getCreatureSVG(type)}</div> <span class="text-sm">${type.charAt(0).toUpperCase() + type.slice(1)}: ${count}</span></div>`;
-                            //html += `<div class="flex items-center gap-2"><div class="w-6 h-6">${this.getCreatureSVG(type)}</div> <span class="text-sm">${type.charAt(0).toUpperCase() + type.slice(1)}: ${count}</span></div>`;
                         });
                         html += "</div></div>";
                     }
@@ -2930,9 +2975,9 @@
         showView("landing");
     </script>
     <!-- Footer -->
-    <footer class="bg-green-800 text-white p-4 text-center">
+    <footer class="bg-green-800 text-white p-4 text-center fixed bottom-0 w-full">
         <p id="footer-text">
-            © 2025 Wildlife Reserve Simulator | All rights reserved
+            &copy; 2025 Wildlife Reserve Simulator | All rights reserved
         </p>
     </footer>
 
